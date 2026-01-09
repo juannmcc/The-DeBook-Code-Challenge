@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Unique, Column, CreateDateColumn } from 'typeorm';
-import { Post } from '@/modules/posts/post.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity('post_likes')
 @Unique(['post', 'user_id'])

@@ -45,7 +45,7 @@ describe('PostsController (e2e)', () => {
 
   it('should list posts with likes_count', async () => {
     const postRepo = dataSource.getRepository('posts');
-    await postRepo.save({ content: 'Another post', likes_count: 3 });
+    await postRepo.save({ content: 'Another post', likes_count: 3, comments_count: 2 });
 
     const res = await request(app.getHttpServer())
       .get('/v1/posts')
@@ -65,7 +65,29 @@ describe('PostsController (e2e)', () => {
     expect(res.body).toHaveProperty('total', expect.any(Number));
   });
 
+  it('should get a post with likes_count and comments_count', async () => {
+    const post = await dataSource.getRepository('posts').save({
+      content: 'Another post',
+      likes_count: 2,
+      comments_count: 5,
+    });
+
+    const res = await request(app.getHttpServer())
+      .get(`/v1/posts/${post.id}`)
+      .expect(200);
+
+    expect(res.body).toEqual({
+      id: post.id,
+      content: post.content,
+      likes_count: 2,
+      comments_count: 5,
+      created_at: expect.any(String),
+      updated_at: expect.any(String),
+    });
+  });
+
   afterAll(async () => {
+    await dataSource.destroy();
     await app.close();
   });
 });

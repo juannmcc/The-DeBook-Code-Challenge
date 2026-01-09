@@ -1,4 +1,4 @@
-import { Controller, Post as PostRoute, Param, Headers, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post as PostRoute, Headers } from '@nestjs/common';
 import { InteractionsService } from '../interactions/interactions.service';
 import { PostsService } from './posts.service';
 import { Post } from './post.entity';
@@ -15,29 +15,39 @@ export class PostsController {
     const numericUserId = Number(userId);
     const post = { id: Number(id) } as Post;
 
-    const { like, wasNew } = await this.interactionsService.likePost(numericUserId, post);
+    const result = await this.interactionsService.likePost(numericUserId, post);
 
-    if (!wasNew) {
-      return { likes_count: 1, message: 'Already liked' };
+    return {
+      likes_count: 1,
+      message: result.wasNew ? 'Liked' : 'Already liked',
+    };
+  }
+
+  @Get(':id')
+  async getPost(@Param('id') id: string) {
+    const numericId = Number(id);
+    const post = await this.postsService.findOneWithCounters(numericId);
+
+    if (!post) {
+      return { message: 'Post not found' };
     }
 
-    return { likes_count: 1, message: 'Liked' };
+    return post;
   }
 
   @Get()
-  async getPosts(
-    @Query('page') page = '1',
-    @Query('limit') limit = '10',
-  ) {
-    const numericPage = Number(page);
-    const numericLimit = Number(limit);
+  async listPosts() {
+    const page = 1;
+    const limit = 10;
 
-    const result = await this.postsService.findAll(numericPage, numericLimit);
+    const posts = await this.postsService.findAll({ page, limit });
+    const total = await this.postsService.count();
+
     return {
-      page: numericPage,
-      limit: numericLimit,
-      total: result.total,
-      data: result.data,
+      data: posts,
+      page,
+      limit,
+      total,
     };
   }
 }
