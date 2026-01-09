@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
+import { PostsModule } from './modules/posts/posts.module';
+import { InteractionsModule } from './modules/interactions/interactions.module';
 
 @Module({
   imports: [
@@ -16,8 +17,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: false,
     }),
+    EventEmitterModule.forRoot(),
+    PostsModule,
+    InteractionsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
