@@ -13,19 +13,19 @@ export class InteractionsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async likePost(userId: number, post: Post): Promise<PostLike | null> {
+  async likePost(userId: number, post: Post): Promise<{ like: PostLike, wasNew: boolean } | PostLike> {
     const existing = await this.likeRepo.findOne({
       where: { user_id: userId, post: { id: post.id } },
       relations: ['post'],
     });
 
-    if (existing) return existing;
+    if (existing) return { ...existing, wasNew: false };
 
     const like = this.likeRepo.create({ user_id: userId, post });
     await this.likeRepo.save(like);
 
     this.eventEmitter.emit('post.liked', { userId, postId: post.id });
 
-    return like;
+    return { ...like, wasNew: true };
   }
 }
