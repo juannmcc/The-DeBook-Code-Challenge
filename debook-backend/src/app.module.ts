@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { PostsModule } from './modules/posts/posts.module';
 import { InteractionsModule } from './modules/interactions/interactions.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -14,13 +14,13 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: false,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
     }),
-    EventEmitterModule.forRoot(),
     PostsModule,
     InteractionsModule,
-    NotificationsModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

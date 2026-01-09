@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { PostLike } from '@/modules/interactions/post-like.entity';
+import { PostLike } from '../interactions/post-like.entity';
 
 @Entity('posts')
 export class Post {
@@ -11,6 +11,9 @@ export class Post {
 
   @Column({ type: 'int', default: 0 })
   likes_count!: number;
+
+  @Column({ type: 'int', default: 0 })
+  comments_count!: number;
 
   @CreateDateColumn()
   created_at!: Date;
