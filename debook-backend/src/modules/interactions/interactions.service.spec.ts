@@ -18,6 +18,8 @@ describe('InteractionsService', () => {
   const mockEventEmitter = { emit: jest.fn() };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         InteractionsService,
