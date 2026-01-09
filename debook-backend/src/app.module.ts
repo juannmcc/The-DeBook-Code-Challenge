@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-
 import { PostsModule } from './modules/posts/posts.module';
 import { InteractionsModule } from './modules/interactions/interactions.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -20,6 +20,7 @@ import { InteractionsModule } from './modules/interactions/interactions.module';
     EventEmitterModule.forRoot(),
     PostsModule,
     InteractionsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
