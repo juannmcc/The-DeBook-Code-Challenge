@@ -38,14 +38,16 @@ describe('InteractionsService', () => {
     mockRepo.save.mockResolvedValue({ user_id: 1, post: { id: 1 } });
 
     const result = await service.likePost(1, { id: 1 } as any);
-    expect(result).toBeDefined();
+    expect(result.like).toBeDefined();
+    expect(result.wasNew).toBe(true);
     expect(mockEventEmitter.emit).toHaveBeenCalledWith('post.liked', { userId: 1, postId: 1 });
   });
 
   it('should not create duplicate like', async () => {
     mockRepo.findOne.mockResolvedValue({ user_id: 1, post: { id: 1 } });
     const result = await service.likePost(1, { id: 1 } as any);
-    expect(result).toBeDefined();
+    expect(result.like).toBeDefined();
+    expect(result.wasNew).toBe(false);
     expect(mockEventEmitter.emit).not.toHaveBeenCalled();
   });
 });

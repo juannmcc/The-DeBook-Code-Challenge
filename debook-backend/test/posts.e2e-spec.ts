@@ -21,7 +21,10 @@ describe('PostsController (e2e)', () => {
   });
 
   it('should like a post and be idempotent', async () => {
-    const post = await dataSource.getRepository('posts').save({ content: 'Test post', likes_count: 0 });
+    const post = await dataSource.getRepository('posts').save({
+      content: 'Test post',
+      likes_count: 0,
+    });
 
     const res1 = await request(app.getHttpServer())
       .post(`/v1/posts/${post.id}/like`)
@@ -36,8 +39,30 @@ describe('PostsController (e2e)', () => {
       .set('x-user-id', '1')
       .expect(201);
 
-    expect(res2.body.likes_count).toBe(1); 
+    expect(res2.body.likes_count).toBe(1);
     expect(res2.body.message).toBe('Already liked');
+  });
+
+  it('should list posts with likes_count', async () => {
+    const postRepo = dataSource.getRepository('posts');
+    await postRepo.save({ content: 'Another post', likes_count: 3 });
+
+    const res = await request(app.getHttpServer())
+      .get('/v1/posts')
+      .expect(200);
+
+    expect(res.body.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          content: expect.any(String),
+          likes_count: expect.any(Number),
+        }),
+      ]),
+    );
+
+    expect(res.body).toHaveProperty('page', 1);
+    expect(res.body).toHaveProperty('limit', 10);
+    expect(res.body).toHaveProperty('total', expect.any(Number));
   });
 
   afterAll(async () => {
