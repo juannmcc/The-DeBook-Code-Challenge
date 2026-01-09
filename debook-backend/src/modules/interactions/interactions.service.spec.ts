@@ -3,7 +3,7 @@ import { InteractionsService } from './interactions.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PostLike } from './post-like.entity';
 import { Repository } from 'typeorm';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificationsService } from '../notifications/notifications.service';
 
 describe('InteractionsService', () => {
   let service: InteractionsService;
@@ -15,7 +15,9 @@ describe('InteractionsService', () => {
     save: jest.fn(),
   };
 
-  const mockEventEmitter = { emit: jest.fn() };
+  const mockNotificationsService = {
+    notifyLike: jest.fn().mockResolvedValue(undefined),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -24,7 +26,7 @@ describe('InteractionsService', () => {
       providers: [
         InteractionsService,
         { provide: getRepositoryToken(PostLike), useValue: mockRepo },
-        { provide: EventEmitter2, useValue: mockEventEmitter },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 
@@ -40,7 +42,7 @@ describe('InteractionsService', () => {
     const result = await service.likePost(1, { id: 1 } as any);
     expect(result.like).toBeDefined();
     expect(result.wasNew).toBe(true);
-    expect(mockEventEmitter.emit).toHaveBeenCalledWith('post.liked', { userId: 1, postId: 1 });
+    expect(mockNotificationsService.notifyLike).toHaveBeenCalledWith(1, 1);
   });
 
   it('should not create duplicate like', async () => {
@@ -48,6 +50,6 @@ describe('InteractionsService', () => {
     const result = await service.likePost(1, { id: 1 } as any);
     expect(result.like).toBeDefined();
     expect(result.wasNew).toBe(false);
-    expect(mockEventEmitter.emit).not.toHaveBeenCalled();
+    expect(mockNotificationsService.notifyLike).not.toHaveBeenCalled();
   });
 });
