@@ -47,4 +47,13 @@ export class PostsService {
   async count() {
     return this.postRepo.count();
   }
+
+  async incrementLikes(post: Post, increment = 1): Promise<Post> {
+    post.likes_count += increment;
+    return this.postRepo.save(post);
+  }
+
+  findOne(id: number): Promise<Post | null> {
+    return this.postRepo.findOne({ where: { id } });
+  }
 }
